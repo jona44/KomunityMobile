@@ -4,6 +4,8 @@ import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 
+import { Feather } from '@expo/vector-icons';
+
 interface BottomNavBarProps {
     activeTab: 'home' | 'discovery' | 'wallet' | 'profile';
     onTabPress: (tab: 'home' | 'discovery' | 'wallet' | 'profile') => void;
@@ -40,7 +42,12 @@ const BottomNavBar = ({ activeTab, onTabPress, onBack, profilePicture }: BottomN
                 style={styles.navItem}
                 onPress={() => handlePress('home')}
             >
-                <Text style={[styles.navIcon, activeTab === 'home' && styles.activeIcon]}>🏠</Text>
+                <Feather 
+                    name="users" 
+                    size={22} 
+                    color={activeTab === 'home' ? '#2563eb' : '#9ca3af'} 
+                    style={{ marginBottom: 4 }} 
+                />
                 <Text style={[styles.navText, activeTab === 'home' && styles.activeText]}>My Groups</Text>
             </TouchableOpacity>
 
@@ -48,7 +55,12 @@ const BottomNavBar = ({ activeTab, onTabPress, onBack, profilePicture }: BottomN
                 style={styles.navItem}
                 onPress={() => handlePress('discovery')}
             >
-                <Text style={[styles.navIcon, activeTab === 'discovery' && styles.activeIcon]}>🔍</Text>
+                <Feather 
+                    name="search" 
+                    size={22} 
+                    color={activeTab === 'discovery' ? '#2563eb' : '#9ca3af'} 
+                    style={{ marginBottom: 4 }} 
+                />
                 <Text style={[styles.navText, activeTab === 'discovery' && styles.activeText]}>Explore</Text>
             </TouchableOpacity>
 
@@ -56,7 +68,12 @@ const BottomNavBar = ({ activeTab, onTabPress, onBack, profilePicture }: BottomN
                 style={styles.navItem}
                 onPress={() => handlePress('wallet')}
             >
-                <Text style={[styles.navIcon, activeTab === 'wallet' && styles.activeIcon]}>💳</Text>
+                <Feather 
+                    name="credit-card" 
+                    size={22} 
+                    color={activeTab === 'wallet' ? '#2563eb' : '#9ca3af'} 
+                    style={{ marginBottom: 4 }} 
+                />
                 <Text style={[styles.navText, activeTab === 'wallet' && styles.activeText]}>Wallet</Text>
             </TouchableOpacity>
 
@@ -71,7 +88,12 @@ const BottomNavBar = ({ activeTab, onTabPress, onBack, profilePicture }: BottomN
                         transition={200}
                     />
                 ) : (
-                    <Text style={[styles.navIcon, activeTab === 'profile' && styles.activeIcon]}>👤</Text>
+                    <Feather 
+                        name="user" 
+                        size={22} 
+                        color={activeTab === 'profile' ? '#2563eb' : '#9ca3af'} 
+                        style={{ marginBottom: 4 }} 
+                    />
                 )}
                 <Text style={[styles.navText, activeTab === 'profile' && styles.activeText]}>Profile</Text>
             </TouchableOpacity>

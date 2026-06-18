@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView, Platform } from 'react-native';
 import client, { setAuthToken, saveToken } from '../api/client';
 import { validateEmail } from '../utils/validation';
 
@@ -7,11 +7,13 @@ interface LoginProps {
     onLoginSuccess: () => void;
     onShowSignUp: () => void;
     onForgotPassword: () => void;
+    onBack?: () => void;
 }
 
-const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword }: LoginProps) => {
+const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword, onBack }: LoginProps) => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [errors, setErrors] = React.useState<{ [key: string]: string | null }>({});
 
@@ -29,7 +31,7 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword }: LoginPr
         setLoading(true);
         try {
             const response = await client.post('auth-token/', {
-                username: email.trim(),
+                email: email.trim(),
                 password: password,
             });
 
@@ -53,7 +55,11 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword }: LoginPr
                 errorMessage = 'Network Error. Check your server IP.';
             }
 
-            Alert.alert('Login Failed', errorMessage);
+            if (Platform.OS === 'web') {
+                window.alert(`Login Failed\n\n${errorMessage}`);
+            } else {
+                Alert.alert('Login Failed', errorMessage);
+            }
         } finally {
             setLoading(false);
         }
@@ -62,6 +68,11 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword }: LoginPr
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.innerContainer}>
+                {onBack && (
+                    <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
+                        <Text style={styles.backButtonText}>← Back</Text>
+                    </TouchableOpacity>
+                )}
                 <Text style={styles.title}>Komunity</Text>
                 <Text style={styles.subtitle}>Sign in to your account</Text>
 
@@ -78,16 +89,27 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword }: LoginPr
                 />
                 {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-                <TextInput
-                    style={[styles.input, errors.password && styles.inputError]}
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={(text) => {
-                        setPassword(text);
-                        if (errors.password) setErrors((prev: any) => ({ ...prev, password: null }));
-                    }}
-                    secureTextEntry
-                />
+                <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
+                    <TextInput
+                        style={styles.passwordInput}
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={(text) => {
+                            setPassword(text);
+                            if (errors.password) setErrors((prev: any) => ({ ...prev, password: null }));
+                        }}
+                        secureTextEntry={!isPasswordVisible}
+                    />
+                    <TouchableOpacity
+                        style={styles.eyeButton}
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={styles.eyeButtonText}>
+                            {isPasswordVisible ? 'Hide' : 'Show'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
                 {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
                 <TouchableOpacity
@@ -157,6 +179,30 @@ const styles = StyleSheet.create({
         borderColor: '#ef4444',
         backgroundColor: '#fef2f2',
     },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f9fafb',
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        borderRadius: 12,
+        marginBottom: 16,
+    },
+    passwordInput: {
+        flex: 1,
+        padding: 16,
+        fontSize: 16,
+    },
+    eyeButton: {
+        paddingHorizontal: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    eyeButtonText: {
+        color: '#2563eb',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
     errorText: {
         color: '#ef4444',
         fontSize: 12,
@@ -205,6 +251,18 @@ const styles = StyleSheet.create({
     signUpLinkBold: {
         color: '#2563eb',
         fontWeight: 'bold',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        padding: 8,
+        zIndex: 10,
+    },
+    backButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#2563eb',
     },
 });
 

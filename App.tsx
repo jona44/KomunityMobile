@@ -13,6 +13,7 @@ import CreatePostScreen from './src/screens/CreatePostScreen';
 import WalletScreen from './src/screens/WalletScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import ProfileSetupScreen from './src/screens/ProfileSetupScreen';
+import WelcomeScreen from './src/screens/WelcomeScreen';
 import DiscoveryScreen from './src/screens/DiscoveryScreen';
 import PasswordResetScreen from './src/screens/PasswordResetScreen';
 import GroupManagementScreen from './src/screens/GroupManagementScreen';
@@ -37,6 +38,7 @@ export default function App() {
   const [isResettingPassword, setIsResettingPassword] = React.useState(false);
   const [needsProfileSetup, setNeedsProfileSetup] = React.useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
+  const [showWelcome, setShowWelcome] = React.useState(true);
   const [userProfile, setUserProfile] = React.useState<any>(null);
   const [selectedGroup, setSelectedGroup] = React.useState<any>(null);
   const [selectedPost, setSelectedPost] = React.useState<any>(null);
@@ -202,10 +204,24 @@ export default function App() {
   if (!isLoggedIn) {
     return (
       <ErrorBoundary>
-        {isSigningUp ? (
+        {showWelcome ? (
+          <WelcomeScreen
+            onShowLogin={() => {
+              setShowWelcome(false);
+              setIsSigningUp(false);
+            }}
+            onShowSignUp={() => {
+              setShowWelcome(false);
+              setIsSigningUp(true);
+            }}
+          />
+        ) : isSigningUp ? (
           <SignUpScreen
             onSignUpSuccess={handleSignUpSuccess}
-            onBackToLogin={() => setIsSigningUp(false)}
+            onBackToLogin={() => {
+              setIsSigningUp(false);
+            }}
+            onBack={() => setShowWelcome(true)}
           />
         ) : isResettingPassword ? (
           <PasswordResetScreen
@@ -214,8 +230,11 @@ export default function App() {
         ) : (
           <LoginScreen
             onLoginSuccess={handleLoginSuccess}
-            onShowSignUp={() => setIsSigningUp(true)}
+            onShowSignUp={() => {
+              setIsSigningUp(true);
+            }}
             onForgotPassword={() => setIsResettingPassword(true)}
+            onBack={() => setShowWelcome(true)}
           />
         )}
       </ErrorBoundary>

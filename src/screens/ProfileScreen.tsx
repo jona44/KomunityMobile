@@ -43,6 +43,14 @@ const ProfileScreen = ({ onBack, onLogout, onProfileUpdate }: ProfileScreenProps
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
+    const showAlert = (title: string, message: string) => {
+        if (Platform.OS === 'web') {
+            window.alert(`${title}: ${message}`);
+        } else {
+            Alert.alert(title, message);
+        }
+    };
+
     // Editable fields
     const [firstName, setFirstName] = useState('');
     const [surname, setSurname] = useState('');
@@ -83,7 +91,7 @@ const ProfileScreen = ({ onBack, onLogout, onProfileUpdate }: ProfileScreenProps
             setProfilePicture(null); // Reset local selection
         } catch (error) {
             console.error('Error fetching profile:', error);
-            Alert.alert('Error', 'Failed to load profile');
+            showAlert('Error', 'Failed to load profile');
         } finally {
             setLoading(false);
         }
@@ -94,21 +102,25 @@ const ProfileScreen = ({ onBack, onLogout, onProfileUpdate }: ProfileScreenProps
     }, [fetchProfile]);
 
     const pickImage = async () => {
-        Alert.alert(
-            'Profile Picture',
-            'Choose a source for your profile photo',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Take Photo', onPress: handleCameraLaunch },
-                { text: 'Choose from Gallery', onPress: handleGalleryLaunch },
-            ]
-        );
+        if (Platform.OS === 'web') {
+            handleGalleryLaunch();
+        } else {
+            Alert.alert(
+                'Profile Picture',
+                'Choose a source for your profile photo',
+                [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Take Photo', onPress: handleCameraLaunch },
+                    { text: 'Choose from Gallery', onPress: handleGalleryLaunch },
+                ]
+            );
+        }
     };
 
     const handleCameraLaunch = async () => {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-            Alert.alert('Permission Needed', 'We need permission to use your camera to change your profile picture.');
+            showAlert('Permission Needed', 'We need permission to use your camera to change your profile picture.');
             return;
         }
 
@@ -127,7 +139,7 @@ const ProfileScreen = ({ onBack, onLogout, onProfileUpdate }: ProfileScreenProps
     const handleGalleryLaunch = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-            Alert.alert('Permission Needed', 'We need permission to access your gallery to change your profile picture.');
+            showAlert('Permission Needed', 'We need permission to access your gallery to change your profile picture.');
             return;
         }
 
@@ -184,35 +196,43 @@ const ProfileScreen = ({ onBack, onLogout, onProfileUpdate }: ProfileScreenProps
                 },
             });
 
-            Alert.alert('Success', 'Profile updated successfully');
+            showAlert('Success', 'Profile updated successfully');
             setIsEditing(false);
             fetchProfile(); // Refresh local data
             onProfileUpdate?.(); // Refresh global data (like nav bar)
         } catch (error: any) {
             console.error('Error saving profile:', error);
             const errorMsg = error.response?.data ? JSON.stringify(error.response.data) : 'Failed to update profile';
-            Alert.alert('Error', errorMsg);
+            showAlert('Error', errorMsg);
         } finally {
             setIsSaving(false);
         }
     };
 
     const handleLogout = () => {
-        Alert.alert(
-            'Logout',
-            'Are you sure you want to logout?',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Logout',
-                    style: 'destructive',
-                    onPress: () => {
-                        console.log('ProfileScreen: Logout confirmed');
-                        onLogout();
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm('Are you sure you want to logout?');
+            if (confirmed) {
+                console.log('ProfileScreen: Logout confirmed (web)');
+                onLogout();
+            }
+        } else {
+            Alert.alert(
+                'Logout',
+                'Are you sure you want to logout?',
+                [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                        text: 'Logout',
+                        style: 'destructive',
+                        onPress: () => {
+                            console.log('ProfileScreen: Logout confirmed');
+                            onLogout();
+                        }
                     }
-                }
-            ]
-        );
+                ]
+            );
+        }
     };
 
     const onDateChange = (event: any, selectedDate?: Date) => {

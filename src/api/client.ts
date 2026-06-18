@@ -3,7 +3,26 @@ import * as SecureStore from 'expo-secure-store';
 
 import { Platform } from 'react-native';
 
-const API_BASE_URL = 'http://192.168.88.236:8000/api/v1/'; // Use machine IP for mobile devices
+import Constants from 'expo-constants';
+
+const LOCAL_API_URL = 'http://127.0.0.1:8000/api/v1/';
+
+// Dynamically get the Expo host IP for LAN connections
+let hostIp = '192.168.88.224'; // default fallback
+if (Constants.expoConfig?.hostUri) {
+    const ip = Constants.expoConfig.hostUri.split(':')[0];
+    if (ip) {
+        hostIp = ip;
+    }
+}
+
+const LAN_API_URL = `http://${hostIp}:8000/api/v1/`;
+
+const API_BASE_URL = Platform.OS === 'web'
+    ? LOCAL_API_URL
+    : LAN_API_URL;
+
+console.log('[Komunity API] Using base URL:', API_BASE_URL);
 
 const TOKEN_KEY = 'komunity_auth_token';
 

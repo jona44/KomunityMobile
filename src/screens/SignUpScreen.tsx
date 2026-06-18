@@ -6,12 +6,15 @@ import { validateEmail, validatePassword } from '../utils/validation';
 interface SignUpProps {
     onSignUpSuccess: (token: string) => void;
     onBackToLogin: () => void;
+    onBack?: () => void;
 }
 
-const SignUpScreen = ({ onSignUpSuccess, onBackToLogin }: SignUpProps) => {
+const SignUpScreen = ({ onSignUpSuccess, onBackToLogin, onBack }: SignUpProps) => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
+    const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
+    const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [errors, setErrors] = React.useState<{ [key: string]: string | null }>({});
 
@@ -37,7 +40,7 @@ const SignUpScreen = ({ onSignUpSuccess, onBackToLogin }: SignUpProps) => {
 
             // 2. Login to get token
             const loginResponse = await client.post('auth-token/', {
-                username: email.trim(),
+                email: email.trim(),
                 password: password,
             });
 
@@ -57,7 +60,11 @@ const SignUpScreen = ({ onSignUpSuccess, onBackToLogin }: SignUpProps) => {
                 }
             }
 
-            Alert.alert('Registration Failed', errorMessage);
+            if (Platform.OS === 'web') {
+                window.alert(`Registration Failed\n\n${errorMessage}`);
+            } else {
+                Alert.alert('Registration Failed', errorMessage);
+            }
         } finally {
             setLoading(false);
         }
@@ -71,6 +78,11 @@ const SignUpScreen = ({ onSignUpSuccess, onBackToLogin }: SignUpProps) => {
             >
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <View style={styles.innerContainer}>
+                        {onBack && (
+                            <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
+                                <Text style={styles.backButtonText}>← Back</Text>
+                            </TouchableOpacity>
+                        )}
                         <Text style={styles.title}>Join Komunity</Text>
                         <Text style={styles.subtitle}>Create an account to connect with your community</Text>
 
@@ -87,28 +99,50 @@ const SignUpScreen = ({ onSignUpSuccess, onBackToLogin }: SignUpProps) => {
                         />
                         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-                        <TextInput
-                            style={[styles.input, errors.password && styles.inputError]}
-                            placeholder="Password"
-                            value={password}
-                            onChangeText={(text) => {
-                                setPassword(text);
-                                if (errors.password) setErrors((prev: any) => ({ ...prev, password: null }));
-                            }}
-                            secureTextEntry
-                        />
+                        <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
+                            <TextInput
+                                style={styles.passwordInput}
+                                placeholder="Password"
+                                value={password}
+                                onChangeText={(text) => {
+                                    setPassword(text);
+                                    if (errors.password) setErrors((prev: any) => ({ ...prev, password: null }));
+                                }}
+                                secureTextEntry={!isPasswordVisible}
+                            />
+                            <TouchableOpacity
+                                style={styles.eyeButton}
+                                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.eyeButtonText}>
+                                    {isPasswordVisible ? 'Hide' : 'Show'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
-                        <TextInput
-                            style={[styles.input, errors.confirmPassword && styles.inputError]}
-                            placeholder="Confirm Password"
-                            value={confirmPassword}
-                            onChangeText={(text) => {
-                                setConfirmPassword(text);
-                                if (errors.confirmPassword) setErrors((prev: any) => ({ ...prev, confirmPassword: null }));
-                            }}
-                            secureTextEntry
-                        />
+                        <View style={[styles.passwordContainer, errors.confirmPassword && styles.inputError]}>
+                            <TextInput
+                                style={styles.passwordInput}
+                                placeholder="Confirm Password"
+                                value={confirmPassword}
+                                onChangeText={(text) => {
+                                    setConfirmPassword(text);
+                                    if (errors.confirmPassword) setErrors((prev: any) => ({ ...prev, confirmPassword: null }));
+                                }}
+                                secureTextEntry={!isConfirmPasswordVisible}
+                            />
+                            <TouchableOpacity
+                                style={styles.eyeButton}
+                                onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.eyeButtonText}>
+                                    {isConfirmPasswordVisible ? 'Hide' : 'Show'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                         {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
 
                         <TouchableOpacity
@@ -176,6 +210,30 @@ const styles = StyleSheet.create({
         borderColor: '#ef4444',
         backgroundColor: '#fef2f2',
     },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f9fafb',
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        borderRadius: 12,
+        marginBottom: 16,
+    },
+    passwordInput: {
+        flex: 1,
+        padding: 16,
+        fontSize: 16,
+    },
+    eyeButton: {
+        paddingHorizontal: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    eyeButtonText: {
+        color: '#2563eb',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
     errorText: {
         color: '#ef4444',
         fontSize: 12,
@@ -215,6 +273,18 @@ const styles = StyleSheet.create({
     loginLinkBold: {
         color: '#2563eb',
         fontWeight: 'bold',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        padding: 8,
+        zIndex: 10,
+    },
+    backButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#2563eb',
     },
 });
 
