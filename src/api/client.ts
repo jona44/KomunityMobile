@@ -19,10 +19,8 @@ if (Constants.expoConfig?.hostUri) {
 const LAN_API_URL = `http://${hostIp}:8000/api/v1/`;
 const PROD_API_URL = 'https://komunityweb.onrender.com/api/v1/';
 
-// Use local server for Expo Go development, but use Render for built APKs
-const API_BASE_URL = __DEV__ 
-    ? (Platform.OS === 'web' ? LOCAL_API_URL : LAN_API_URL)
-    : PROD_API_URL;
+// Force Render connection instead of local server
+const API_BASE_URL = PROD_API_URL;
 
 console.log('[Komunity API] Using base URL:', API_BASE_URL);
 
