@@ -8,7 +8,7 @@ import Constants from 'expo-constants';
 const LOCAL_API_URL = 'http://127.0.0.1:8000/api/v1/';
 
 // Dynamically get the Expo host IP for LAN connections
-let hostIp = '192.168.88.224'; // default fallback
+let hostIp = '192.168.88.201'; // default fallback
 if (Constants.expoConfig?.hostUri) {
     const ip = Constants.expoConfig.hostUri.split(':')[0];
     if (ip) {
@@ -17,10 +17,12 @@ if (Constants.expoConfig?.hostUri) {
 }
 
 const LAN_API_URL = `http://${hostIp}:8000/api/v1/`;
+const PROD_API_URL = 'https://komunityweb.onrender.com/api/v1/';
 
-const API_BASE_URL = Platform.OS === 'web'
-    ? LOCAL_API_URL
-    : LAN_API_URL;
+// Use local server for Expo Go development, but use Render for built APKs
+const API_BASE_URL = __DEV__ 
+    ? (Platform.OS === 'web' ? LOCAL_API_URL : LAN_API_URL)
+    : PROD_API_URL;
 
 console.log('[Komunity API] Using base URL:', API_BASE_URL);
 
