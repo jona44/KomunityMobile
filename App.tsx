@@ -1,36 +1,43 @@
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, Text, StyleSheet as RNStyleSheet } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import * as Linking from 'expo-linking';
-import * as Haptics from 'expo-haptics';
-import LoginScreen from './src/screens/LoginScreen';
-import HomeScreen from './src/screens/HomeScreen';
-import GroupFeedScreen from './src/screens/GroupFeedScreen';
-import PostDetailScreen from './src/screens/PostDetailScreen';
-import GroupDetailScreen from './src/screens/GroupDetailScreen';
-import CreatePostScreen from './src/screens/CreatePostScreen';
-import WalletScreen from './src/screens/WalletScreen';
-import SignUpScreen from './src/screens/SignUpScreen';
-import ProfileSetupScreen from './src/screens/ProfileSetupScreen';
-import WelcomeScreen from './src/screens/WelcomeScreen';
-import DiscoveryScreen from './src/screens/DiscoveryScreen';
-import PasswordResetScreen from './src/screens/PasswordResetScreen';
-import GroupManagementScreen from './src/screens/GroupManagementScreen';
-import MemberProfileScreen from './src/screens/MemberProfileScreen';
-import MemberListScreen from './src/screens/MemberListScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
-import GroupWalletScreen from './src/screens/GroupWalletScreen';
-import GroupSelectionScreen from './src/screens/GroupSelectionScreen';
-import CreateGroupScreen from './src/screens/CreateGroupScreen';
-import ContributionsScreen from './src/screens/ContributionsScreen';
-import EditGroupScreen from './src/screens/EditGroupScreen';
-import ContactsScreen from './src/screens/ContactsScreen';
-import AnimatedScreen from './src/components/AnimatedScreen';
-import BottomNavBar from './src/components/BottomNavBar';
-import TopNavBar from './src/components/TopNavBar';
-import ErrorBoundary from './src/components/ErrorBoundary';
-import client, { setAuthToken, loadToken, clearToken } from './src/api/client';
+import React from "react";
+import { StatusBar } from "expo-status-bar";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  StyleSheet as RNStyleSheet,
+  BackHandler,
+} from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import * as Linking from "expo-linking";
+import * as Haptics from "expo-haptics";
+import LoginScreen from "./src/screens/LoginScreen";
+import HomeScreen from "./src/screens/HomeScreen";
+import GroupFeedScreen from "./src/screens/GroupFeedScreen";
+import PostDetailScreen from "./src/screens/PostDetailScreen";
+import GroupDetailScreen from "./src/screens/GroupDetailScreen";
+import CreatePostScreen from "./src/screens/CreatePostScreen";
+import WalletScreen from "./src/screens/WalletScreen";
+import SignUpScreen from "./src/screens/SignUpScreen";
+import ProfileSetupScreen from "./src/screens/ProfileSetupScreen";
+import WelcomeScreen from "./src/screens/WelcomeScreen";
+import DiscoveryScreen from "./src/screens/DiscoveryScreen";
+import GroupPreviewScreen from "./src/screens/GroupPreviewScreen";
+import PasswordResetScreen from "./src/screens/PasswordResetScreen";
+import GroupManagementScreen from "./src/screens/GroupManagementScreen";
+import MemberProfileScreen from "./src/screens/MemberProfileScreen";
+import MemberListScreen from "./src/screens/MemberListScreen";
+import ProfileScreen from "./src/screens/ProfileScreen";
+import GroupWalletScreen from "./src/screens/GroupWalletScreen";
+import GroupSelectionScreen from "./src/screens/GroupSelectionScreen";
+import CreateGroupScreen from "./src/screens/CreateGroupScreen";
+import ContributionsScreen from "./src/screens/ContributionsScreen";
+import EditGroupScreen from "./src/screens/EditGroupScreen";
+import ContactsScreen from "./src/screens/ContactsScreen";
+import AnimatedScreen from "./src/components/AnimatedScreen";
+import BottomNavBar from "./src/components/BottomNavBar";
+import TopNavBar from "./src/components/TopNavBar";
+import ErrorBoundary from "./src/components/ErrorBoundary";
+import client, { setAuthToken, loadToken, clearToken } from "./src/api/client";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -43,20 +50,28 @@ export default function App() {
   const [selectedGroup, setSelectedGroup] = React.useState<any>(null);
   const [selectedPost, setSelectedPost] = React.useState<any>(null);
   const [editingPost, setEditingPost] = React.useState<any>(null);
-  const [viewingGroupDetails, setViewingGroupDetails] = React.useState<any>(null);
+  const [viewingGroupDetails, setViewingGroupDetails] =
+    React.useState<any>(null);
   const [isCreatingPost, setIsCreatingPost] = React.useState(false);
   const [viewingWallet, setViewingWallet] = React.useState(false);
   const [isDiscovering, setIsDiscovering] = React.useState(false);
   const [isManagingGroup, setIsManagingGroup] = React.useState<any>(null);
-  const [viewingMemberProfile, setViewingMemberProfile] = React.useState<any>(null);
-  const [isViewingAllMembers, setIsViewingAllMembers] = React.useState<any>(null);
+  const [viewingMemberProfile, setViewingMemberProfile] =
+    React.useState<any>(null);
+  const [isViewingAllMembers, setIsViewingAllMembers] =
+    React.useState<any>(null);
   const [viewingGroupWallet, setViewingGroupWallet] = React.useState<any>(null);
   const [isChoosingGroup, setIsChoosingGroup] = React.useState(false);
   const [isCreatingGroup, setIsCreatingGroup] = React.useState(false);
-  const [isViewingContributions, setIsViewingContributions] = React.useState(false);
+  const [isViewingContributions, setIsViewingContributions] =
+    React.useState(false);
   const [editingGroup, setEditingGroup] = React.useState<any>(null);
   const [isInviting, setIsInviting] = React.useState<any>(null); // Group to invite to
-  const [activeTab, setActiveTab] = React.useState<'home' | 'discovery' | 'wallet' | 'profile'>('home');
+  const [previewingGroup, setPreviewingGroup] = React.useState<any>(null); // Discovery preview
+  const activeTab_ref = React.useRef<"home" | "discovery" | "wallet" | "profile">("home");
+  const [activeTab, setActiveTab] = React.useState<
+    "home" | "discovery" | "wallet" | "profile"
+  >("home");
 
   const url = Linking.useURL();
 
@@ -74,46 +89,133 @@ export default function App() {
     setViewingGroupWallet(null);
     setIsViewingContributions(false);
     setEditingGroup(null);
+    setPreviewingGroup(null);
   }, []);
 
-  const handleDeepLink = React.useCallback(async (initialUrl: string | null) => {
-    if (!initialUrl) return;
-    try {
-      const { hostname, path } = Linking.parse(initialUrl);
-      console.log('Handling deep link:', { hostname, path });
+  const handleDeepLink = React.useCallback(
+    async (initialUrl: string | null) => {
+      if (!initialUrl) return;
+      try {
+        const { hostname, path } = Linking.parse(initialUrl);
+        console.log("Handling deep link:", { hostname, path });
 
-      // Handle komunity://group/123 or komunity://post/456
-      // For some schemes, hostname is the primary segment
-      const segment = hostname || path?.split('/')[0];
-      const id = path?.includes('/') ? (path.split('/')[1] || path.split('/')[0]) : path;
+        // Handle komunity://group/123 or komunity://post/456
+        // For some schemes, hostname is the primary segment
+        const segment = hostname || path?.split("/")[0];
+        const id = path?.includes("/")
+          ? path.split("/")[1] || path.split("/")[0]
+          : path;
 
-      if (segment === 'group' && id) {
-        const response = await client.get(`groups/${id}/`);
-        resetSubScreens();
-        setSelectedGroup(response.data);
-        setActiveTab('home');
-      } else if (segment === 'post' && id) {
-        const response = await client.get(`posts/${id}/`);
-        resetSubScreens();
-        setSelectedPost(response.data);
+        if (segment === "group" && id) {
+          const response = await client.get(`groups/${id}/`);
+          resetSubScreens();
+          setSelectedGroup(response.data);
+          setActiveTab("home");
+        } else if (segment === "post" && id) {
+          const response = await client.get(`posts/${id}/`);
+          resetSubScreens();
+          setSelectedPost(response.data);
 
-        // Also fetch/set the group context for the post
-        if (response.data.group) {
-          const groupRes = await client.get(`groups/${response.data.group}/`);
-          setSelectedGroup(groupRes.data);
+          // Also fetch/set the group context for the post
+          if (response.data.group) {
+            const groupRes = await client.get(`groups/${response.data.group}/`);
+            setSelectedGroup(groupRes.data);
+          }
+          setActiveTab("home");
         }
-        setActiveTab('home');
+      } catch (error) {
+        console.error("Deep link error:", error);
       }
-    } catch (error) {
-      console.error('Deep link error:', error);
-    }
-  }, [resetSubScreens]);
+    },
+    [resetSubScreens],
+  );
 
   React.useEffect(() => {
     if (url && isLoggedIn && !isCheckingAuth) {
       handleDeepLink(url);
     }
   }, [url, isLoggedIn, isCheckingAuth, handleDeepLink]);
+
+  // Hook Android hardware back button / gesture navigation into app navigation
+  React.useEffect(() => {
+    const onBackPress = () => {
+      // Not logged in — let welcome/login/signup handle their own back or default behavior
+      if (!isLoggedIn) {
+        if (isResettingPassword) {
+          setIsResettingPassword(false);
+          return true;
+        }
+        if (isSigningUp) {
+          setIsSigningUp(false);
+          return true;
+        }
+        if (!showWelcome) {
+          setShowWelcome(true);
+          return true;
+        }
+        return false; // Let OS handle (exit app)
+      }
+
+      // Profile setup / group selection flows
+      if (needsProfileSetup) return false;
+      if (isChoosingGroup) return false;
+
+      // Sub-screen navigation — mirrors getCurrentBackAction()
+      if (isCreatingGroup) { setIsCreatingGroup(false); return true; }
+      if (isViewingContributions) { setIsViewingContributions(false); return true; }
+      if (editingGroup) { setEditingGroup(null); return true; }
+      if (viewingMemberProfile) { setViewingMemberProfile(null); return true; }
+      if (isViewingAllMembers) { setIsViewingAllMembers(null); return true; }
+      if (viewingGroupWallet) { setViewingGroupWallet(null); return true; }
+      if (isManagingGroup) { setIsManagingGroup(null); return true; }
+      if (isInviting) { setIsInviting(null); return true; }
+      if (editingPost) { setEditingPost(null); return true; }
+      if (selectedPost) { setSelectedPost(null); return true; }
+      if (isCreatingPost) { setIsCreatingPost(false); return true; }
+      if (viewingGroupDetails) { setViewingGroupDetails(null); return true; }
+      if (previewingGroup) { setPreviewingGroup(null); return true; }
+      if (selectedGroup) { setSelectedGroup(null); return true; }
+
+      // On a root tab — if not home, go to home first
+      if (activeTab !== "home") {
+        resetSubScreens();
+        setActiveTab("home");
+        return true;
+      }
+
+      // Already on home with no sub-screens — let OS default (minimize/exit)
+      return false;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress,
+    );
+    return () => subscription.remove();
+  }, [
+    isLoggedIn,
+    isSigningUp,
+    isResettingPassword,
+    showWelcome,
+    needsProfileSetup,
+    isChoosingGroup,
+    isCreatingGroup,
+    isViewingContributions,
+    editingGroup,
+    viewingMemberProfile,
+    isViewingAllMembers,
+    viewingGroupWallet,
+    isManagingGroup,
+    isInviting,
+    editingPost,
+    selectedPost,
+    isCreatingPost,
+    viewingGroupDetails,
+    previewingGroup,
+    selectedGroup,
+    activeTab,
+    resetSubScreens,
+  ]);
 
   // Auto-login: try to restore session from secure storage on launch
   React.useEffect(() => {
@@ -122,7 +224,7 @@ export default function App() {
         const token = await loadToken();
         if (token) {
           // Validate the token by fetching the profile
-          const response = await client.get('profiles/me/');
+          const response = await client.get("profiles/me/");
           setUserProfile(response.data);
           if (!response.data.is_complete) {
             setNeedsProfileSetup(true);
@@ -131,7 +233,7 @@ export default function App() {
         }
       } catch (error) {
         // Token is invalid or expired — clear it and show login
-        console.log('Auto-login failed, showing login screen');
+        console.log("Auto-login failed, showing login screen");
         await clearToken();
       } finally {
         setIsCheckingAuth(false);
@@ -142,7 +244,7 @@ export default function App() {
 
   const checkProfileStatus = async () => {
     try {
-      const response = await client.get('profiles/me/');
+      const response = await client.get("profiles/me/");
       if (!response.data.is_complete) {
         setNeedsProfileSetup(true);
       } else {
@@ -150,7 +252,7 @@ export default function App() {
       }
       setUserProfile(response.data);
     } catch (error) {
-      console.error('Error checking profile status:', error);
+      console.error("Error checking profile status:", error);
       // If we can't check, assume it might need setup if it's a new user
     }
   };
@@ -167,10 +269,10 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    console.log('App: Logging out...');
+    console.log("App: Logging out...");
     await clearToken();
     setIsLoggedIn(false);
-    setActiveTab('home');
+    setActiveTab("home");
     setSelectedGroup(null);
     setSelectedPost(null);
     setEditingPost(null);
@@ -184,6 +286,7 @@ export default function App() {
     setViewingGroupWallet(null);
     setNeedsProfileSetup(false);
     setUserProfile(null);
+    setPreviewingGroup(null);
   };
 
   // Show loading screen while checking for stored token
@@ -192,8 +295,24 @@ export default function App() {
       <ErrorBoundary>
         <SafeAreaProvider>
           <StatusBar style="dark" />
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
-            <Text style={{ fontSize: 36, fontWeight: 'bold', color: '#2563eb', marginBottom: 16 }}>Komunity</Text>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#ffffff",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 36,
+                fontWeight: "bold",
+                color: "#2563eb",
+                marginBottom: 16,
+              }}
+            >
+              Komunity
+            </Text>
             <ActivityIndicator size="large" color="#2563eb" />
           </View>
         </SafeAreaProvider>
@@ -245,10 +364,12 @@ export default function App() {
     return (
       <ErrorBoundary>
         <SafeAreaProvider>
-          <ProfileSetupScreen onComplete={() => {
-            setNeedsProfileSetup(false);
-            setIsChoosingGroup(true);
-          }} />
+          <ProfileSetupScreen
+            onComplete={() => {
+              setNeedsProfileSetup(false);
+              setIsChoosingGroup(true);
+            }}
+          />
         </SafeAreaProvider>
       </ErrorBoundary>
     );
@@ -261,7 +382,7 @@ export default function App() {
           <GroupSelectionScreen
             onJoin={() => {
               setIsChoosingGroup(false);
-              setActiveTab('discovery');
+              setActiveTab("discovery");
             }}
             onCreate={() => {
               setIsChoosingGroup(false);
@@ -285,38 +406,64 @@ export default function App() {
     if (selectedPost) return () => setSelectedPost(null);
     if (isCreatingPost) return () => setIsCreatingPost(false);
     if (viewingGroupDetails) return () => setViewingGroupDetails(null);
+    if (previewingGroup) return () => setPreviewingGroup(null);
     if (selectedGroup) return () => setSelectedGroup(null);
     return undefined;
   };
 
-  const getCurrentTitle = () => {
-    if (isCreatingGroup) return 'Create Community';
-    if (isViewingContributions) return 'My Contributions';
-    if (editingGroup) return 'Edit Community';
-    if (viewingMemberProfile) return viewingMemberProfile.member_detail.full_name;
-    if (isViewingAllMembers) return 'Community Members';
-    if (viewingGroupWallet) return 'Group Wallet';
-    if (isManagingGroup) return 'Group Management';
-    if (editingPost) return 'Edit Proposal';
-    if (selectedPost) return 'Discussion';
-    if (isCreatingPost) return 'Create Post';
-    if (viewingGroupDetails) return 'About Group';
-    if (selectedGroup) return selectedGroup.name;
+  const shouldShowTopNavBar = () => {
+    if (isCreatingGroup) return true;
+    if (viewingMemberProfile) return false;
+    if (isViewingAllMembers) return true;
+    if (viewingGroupWallet) return false;
+    if (isManagingGroup) return true;
+    if (editingPost) return true;
+    if (selectedPost) return false;
+    if (isCreatingPost) return true;
+    if (isInviting) return false;
+    if (editingGroup) return true;
+    if (viewingGroupDetails) return true;
+    if (selectedGroup) return false;
 
-    if (activeTab === 'home') return 'My Groups';
-    if (activeTab === 'discovery') return 'Explore';
-    if (activeTab === 'wallet') return 'Wallet';
-    if (activeTab === 'profile') return 'Profile';
-    return 'Komunity';
+    if (isViewingContributions) return true;
+
+    // The bottom tab screens all have their own custom headers
+    return false;
   };
 
+  const getCurrentTitle = () => {
+    if (isCreatingGroup) return "Create Community";
+    if (isViewingContributions) return "My Contributions";
+    if (editingGroup) return "Edit Community";
+    if (viewingMemberProfile)
+      return viewingMemberProfile.member_detail.full_name;
+    if (isViewingAllMembers) return "Community Members";
+    if (viewingGroupWallet) return "Group Wallet";
+    if (isManagingGroup) return "Group Management";
+    if (editingPost) return "Edit Proposal";
+    if (selectedPost) return "Discussion";
+    if (isCreatingPost) return "Create Post";
+    if (viewingGroupDetails) return "About Group";
+    if (selectedGroup) return selectedGroup.name;
+
+    if (activeTab === "home") return "My Groups";
+    if (activeTab === "discovery") return "Explore";
+    if (activeTab === "wallet") return "Wallet";
+    if (activeTab === "profile") return "Profile";
+    return "Komunity";
+  };
 
   return (
     <ErrorBoundary>
       <SafeAreaProvider>
         <StatusBar style="dark" />
-        <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
-          <TopNavBar title={getCurrentTitle()} onBack={getCurrentBackAction()} />
+        <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+          {shouldShowTopNavBar() && (
+            <TopNavBar
+              title={getCurrentTitle()}
+              onBack={getCurrentBackAction()}
+            />
+          )}
           <View style={{ flex: 1, marginBottom: 70 }}>
             {isCreatingGroup ? (
               <AnimatedScreen animation="slideUp">
@@ -325,7 +472,7 @@ export default function App() {
                   onGroupCreated={(group) => {
                     setIsCreatingGroup(false);
                     setSelectedGroup(group);
-                    setActiveTab('home');
+                    setActiveTab("home");
                   }}
                 />
               </AnimatedScreen>
@@ -333,9 +480,13 @@ export default function App() {
               <AnimatedScreen animation="slideRight">
                 <MemberProfileScreen
                   membership={viewingMemberProfile}
-                  isAdmin={selectedGroup?.is_admin || isManagingGroup?.is_admin || viewingGroupDetails?.is_admin}
+                  isAdmin={
+                    selectedGroup?.is_admin ||
+                    isManagingGroup?.is_admin ||
+                    viewingGroupDetails?.is_admin
+                  }
                   onBack={() => setViewingMemberProfile(null)}
-                  onStatusChange={() => { }}
+                  onStatusChange={() => {}}
                 />
               </AnimatedScreen>
             ) : isViewingAllMembers ? (
@@ -343,7 +494,9 @@ export default function App() {
                 <MemberListScreen
                   group={isViewingAllMembers}
                   onBack={() => setIsViewingAllMembers(null)}
-                  onSelectMember={(membership) => setViewingMemberProfile(membership)}
+                  onSelectMember={(membership) =>
+                    setViewingMemberProfile(membership)
+                  }
                 />
               </AnimatedScreen>
             ) : viewingGroupWallet ? (
@@ -358,7 +511,9 @@ export default function App() {
                 <GroupManagementScreen
                   group={isManagingGroup}
                   onBack={() => setIsManagingGroup(null)}
-                  onSelectMember={(membership) => setViewingMemberProfile(membership)}
+                  onSelectMember={(membership) =>
+                    setViewingMemberProfile(membership)
+                  }
                   onViewWallet={() => {
                     setViewingGroupWallet(isManagingGroup);
                   }}
@@ -404,7 +559,8 @@ export default function App() {
                   onBack={() => setEditingGroup(null)}
                   onGroupUpdated={(updatedGroup) => {
                     setEditingGroup(null);
-                    if (viewingGroupDetails) setViewingGroupDetails(updatedGroup);
+                    if (viewingGroupDetails)
+                      setViewingGroupDetails(updatedGroup);
                     if (selectedGroup) setSelectedGroup(updatedGroup);
                   }}
                 />
@@ -421,7 +577,9 @@ export default function App() {
                   onManage={() => {
                     setIsManagingGroup(viewingGroupDetails);
                   }}
-                  onSelectMember={(membership) => setViewingMemberProfile(membership)}
+                  onSelectMember={(membership) =>
+                    setViewingMemberProfile(membership)
+                  }
                   onViewAllMembers={() => {
                     setIsViewingAllMembers(viewingGroupDetails);
                   }}
@@ -445,35 +603,55 @@ export default function App() {
               />
             ) : (
               <View style={{ flex: 1 }}>
-                {activeTab === 'home' && (
+                {activeTab === "home" && (
                   <HomeScreen
                     onSelectGroup={(group: any) => setSelectedGroup(group)}
-                    onViewGroupDetails={(group: any) => setViewingGroupDetails(group)}
-                    onViewWallet={() => setActiveTab('wallet')}
-                    onDiscover={() => setActiveTab('discovery')}
+                    onViewGroupDetails={(group: any) =>
+                      setViewingGroupDetails(group)
+                    }
+                    onViewWallet={() => setActiveTab("wallet")}
+                    onDiscover={() => setActiveTab("discovery")}
+                    onCreateGroup={() => setIsCreatingGroup(true)}
                   />
                 )}
-                {activeTab === 'discovery' && (
-                  <DiscoveryScreen
-                    onBack={() => setActiveTab('home')}
-                    onGroupJoined={() => setActiveTab('home')}
-                  />
-                )}
-                {activeTab === 'wallet' && (
-                  isViewingContributions ? (
+                {activeTab === "discovery" && (
+                  previewingGroup ? (
                     <AnimatedScreen animation="slideRight">
-                      <ContributionsScreen onBack={() => setIsViewingContributions(false)} />
+                      <GroupPreviewScreen
+                        group={previewingGroup}
+                        onBack={() => setPreviewingGroup(null)}
+                        onGroupJoined={() => {
+                          setPreviewingGroup(null);
+                          setActiveTab("home");
+                        }}
+                      />
                     </AnimatedScreen>
                   ) : (
-                    <WalletScreen
-                      onBack={() => setActiveTab('home')}
-                      onViewContributions={() => setIsViewingContributions(true)}
+                    <DiscoveryScreen
+                      onBack={() => setActiveTab("home")}
+                      onGroupJoined={() => setActiveTab("home")}
+                      onViewGroupDetails={(group: any) => setPreviewingGroup(group)}
                     />
                   )
                 )}
-                {activeTab === 'profile' && (
+                {activeTab === "wallet" &&
+                  (isViewingContributions ? (
+                    <AnimatedScreen animation="slideRight">
+                      <ContributionsScreen
+                        onBack={() => setIsViewingContributions(false)}
+                      />
+                    </AnimatedScreen>
+                  ) : (
+                    <WalletScreen
+                      onBack={() => setActiveTab("home")}
+                      onViewContributions={() =>
+                        setIsViewingContributions(true)
+                      }
+                    />
+                  ))}
+                {activeTab === "profile" && (
                   <ProfileScreen
-                    onBack={() => setActiveTab('home')}
+                    onBack={() => setActiveTab("home")}
                     onLogout={handleLogout}
                     onProfileUpdate={checkProfileStatus}
                   />

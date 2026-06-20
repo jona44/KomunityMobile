@@ -1,7 +1,11 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import client, { setAuthToken, saveToken } from '../api/client';
 import { validateEmail, validatePassword } from '../utils/validation';
+
+WebBrowser.maybeCompleteAuthSession();
 
 interface SignUpProps {
     onSignUpSuccess: (token: string) => void;
@@ -65,6 +69,42 @@ const SignUpScreen = ({ onSignUpSuccess, onBackToLogin, onBack }: SignUpProps) =
             } else {
                 Alert.alert('Registration Failed', errorMessage);
             }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+        setLoading(true);
+        try {
+            const backendBaseUrl = client.defaults.baseURL ? client.defaults.baseURL.replace('/api/v1/', '') : 'http://127.0.0.1:8000';
+            const callbackUrl = '/api/v1/auth/mobile-callback/';
+            const authUrl = `${backendBaseUrl}/accounts/${provider}/login/?next=${encodeURIComponent(callbackUrl)}`;
+            
+            console.log('[Social Auth] Requesting URL:', authUrl);
+            
+            const result = await WebBrowser.openAuthSessionAsync(authUrl, 'komunity://auth-success');
+            
+            if (result.type === 'success' && result.url) {
+                console.log('[Social Auth] Success redirect url:', result.url);
+                const parsed = Linking.parse(result.url);
+                const token = parsed.queryParams?.token;
+                
+                if (token && typeof token === 'string') {
+                    setAuthToken(token);
+                    await saveToken(token);
+                    onSignUpSuccess(token);
+                } else {
+                    Alert.alert('Authentication Failed', 'No authentication token returned.');
+                }
+            } else if (result.type === 'cancel') {
+                console.log('[Social Auth] User cancelled sign up');
+            } else {
+                Alert.alert('Authentication Failed', 'Unable to complete social authentication.');
+            }
+        } catch (error: any) {
+            console.error('[Social Auth] Error during sign up:', error);
+            Alert.alert('Error', error.message || 'An unexpected error occurred during social signup.');
         } finally {
             setLoading(false);
         }
@@ -154,6 +194,32 @@ const SignUpScreen = ({ onSignUpSuccess, onBackToLogin, onBack }: SignUpProps) =
                                 {loading ? 'Creating Account...' : 'Create Account'}
                             </Text>
                         </TouchableOpacity>
+
+                        <View style={styles.dividerContainer}>
+                            <View style={styles.dividerLine} />
+                            <Text style={styles.dividerText}>or continue with</Text>
+                            <View style={styles.dividerLine} />
+                        </View>
+
+                        <View style={styles.socialContainer}>
+                            <TouchableOpacity
+                                style={[styles.socialButton, styles.googleButton]}
+                                onPress={() => handleSocialLogin('google')}
+                                disabled={loading}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[styles.socialButtonText, styles.googleButtonText]}>Google</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity
+                                style={[styles.socialButton, styles.facebookButton]}
+                                onPress={() => handleSocialLogin('facebook')}
+                                disabled={loading}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[styles.socialButtonText, styles.facebookButtonText]}>Facebook</Text>
+                            </TouchableOpacity>
+                        </View>
 
                         <TouchableOpacity
                             style={styles.loginLink}
@@ -285,6 +351,52 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#2563eb',
+    },
+    dividerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 20,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#e5e7eb',
+    },
+    dividerText: {
+        color: '#6b7280',
+        paddingHorizontal: 10,
+        fontSize: 14,
+    },
+    socialContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 12,
+        marginBottom: 10,
+    },
+    socialButton: {
+        flex: 1,
+        padding: 14,
+        borderRadius: 12,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+    },
+    googleButton: {
+        backgroundColor: '#ffffff',
+    },
+    facebookButton: {
+        backgroundColor: '#1877f2',
+        borderColor: '#1877f2',
+    },
+    socialButtonText: {
+        fontWeight: '600',
+        fontSize: 16,
+    },
+    googleButtonText: {
+        color: '#1f2937',
+    },
+    facebookButtonText: {
+        color: '#ffffff',
     },
 });
 

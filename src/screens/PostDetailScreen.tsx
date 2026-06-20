@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     navbar: { backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderColor: '#e5e7eb' },
     postCard: { backgroundColor: '#fff', padding: 15, marginBottom: 8 },
     postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-    avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#f3f4f6' },
+    avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#eff6ff', borderWidth: 2, borderColor: '#2563eb' },
     author: { fontWeight: 'bold', fontSize: 16, marginLeft: 12, color: '#111827' },
     date: { color: '#6b7280', fontSize: 12, marginLeft: 12 },
     postContent: { fontSize: 16, color: '#374151', marginBottom: 15, lineHeight: 24 },

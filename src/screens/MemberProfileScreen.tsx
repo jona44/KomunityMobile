@@ -230,13 +230,15 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 60,
-        borderWidth: 4,
-        borderColor: '#f3f4f6',
+        borderWidth: 3,
+        borderColor: '#dbeafe',
     },
     placeholderAvatar: {
         backgroundColor: '#eff6ff',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 3,
+        borderColor: '#2563eb',
     },
     placeholderInitial: {
         fontSize: 48,

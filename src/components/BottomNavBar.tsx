@@ -88,12 +88,16 @@ const BottomNavBar = ({ activeTab, onTabPress, onBack, profilePicture }: BottomN
                         transition={200}
                     />
                 ) : (
-                    <Feather 
-                        name="user" 
-                        size={22} 
-                        color={activeTab === 'profile' ? '#2563eb' : '#9ca3af'} 
-                        style={{ marginBottom: 4 }} 
-                    />
+                    <View style={[
+                        styles.profilePlaceholder,
+                        activeTab === 'profile' && styles.activeProfilePlaceholder
+                    ]}>
+                        <Feather
+                            name="user"
+                            size={16}
+                            color={activeTab === 'profile' ? '#2563eb' : '#9ca3af'}
+                        />
+                    </View>
                 )}
                 <Text style={[styles.navText, activeTab === 'profile' && styles.activeText]}>Profile</Text>
             </TouchableOpacity>
@@ -146,16 +150,31 @@ const styles = StyleSheet.create({
         color: '#2563eb',
     },
     profilePic: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
         marginBottom: 4,
-        opacity: 0.5,
-        borderWidth: 1,
+        opacity: 0.6,
+        borderWidth: 2,
         borderColor: '#e5e7eb',
     },
     activeProfilePic: {
         opacity: 1,
+        borderColor: '#2563eb',
+    },
+    profilePlaceholder: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: '#f3f4f6',
+        borderWidth: 2,
+        borderColor: '#d1d5db',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    activeProfilePlaceholder: {
+        backgroundColor: '#eff6ff',
         borderColor: '#2563eb',
     },
 });

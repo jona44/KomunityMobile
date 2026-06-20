@@ -20,9 +20,10 @@ interface Group {
 interface DiscoveryScreenProps {
     onBack: () => void;
     onGroupJoined: () => void;
+    onViewGroupDetails?: (group: Group) => void;
 }
 
-const DiscoveryScreen = ({ onBack, onGroupJoined }: DiscoveryScreenProps) => {
+const DiscoveryScreen = ({ onBack, onGroupJoined, onViewGroupDetails }: DiscoveryScreenProps) => {
     const insets = useSafeAreaInsets();
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
@@ -173,7 +174,11 @@ const DiscoveryScreen = ({ onBack, onGroupJoined }: DiscoveryScreenProps) => {
                 renderItem={({ item }) => {
                     const btn = getButtonConfig(item);
                     return (
-                        <View style={styles.groupCard}>
+                        <TouchableOpacity
+                            style={styles.groupCard}
+                            onPress={() => onViewGroupDetails?.(item)}
+                            activeOpacity={0.85}
+                        >
                             {item.cover_image ? (
                                 <Image
                                     source={{ uri: item.cover_image }}
@@ -189,6 +194,13 @@ const DiscoveryScreen = ({ onBack, onGroupJoined }: DiscoveryScreenProps) => {
                                 <Text style={styles.description} numberOfLines={3}>
                                     {item.description || 'Connecting community members together.'}
                                 </Text>
+
+                                <TouchableOpacity
+                                    style={styles.viewDetailsLink}
+                                    onPress={() => onViewGroupDetails?.(item)}
+                                >
+                                    <Text style={styles.viewDetailsText}>View Details →</Text>
+                                </TouchableOpacity>
 
                                 <View style={styles.actionRow}>
                                     <TouchableOpacity
@@ -210,7 +222,7 @@ const DiscoveryScreen = ({ onBack, onGroupJoined }: DiscoveryScreenProps) => {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     );
                 }}
                 ListEmptyComponent={
@@ -295,6 +307,14 @@ const styles = StyleSheet.create({
         color: '#3b82f6',
         fontWeight: '600',
         marginBottom: 8,
+    },
+    viewDetailsLink: {
+        marginBottom: 12,
+    },
+    viewDetailsText: {
+        fontSize: 14,
+        color: '#2563eb',
+        fontWeight: '600',
     },
     description: {
         fontSize: 14,

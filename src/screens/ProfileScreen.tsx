@@ -637,8 +637,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#eff6ff',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#dbeafe',
+        borderWidth: 3,
+        borderColor: '#2563eb',
     },
     avatarText: {
         fontSize: 40,

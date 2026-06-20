@@ -529,8 +529,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 12,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#dbeafe',
+        borderWidth: 2,
+        borderColor: '#2563eb',
     },
     avatarImg: {
         width: '100%',

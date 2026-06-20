@@ -401,8 +401,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 12,
-        borderWidth: 1,
-        borderColor: '#dbeafe',
+        borderWidth: 2,
+        borderColor: '#2563eb',
         overflow: 'hidden',
     },
     avatarImage: {
