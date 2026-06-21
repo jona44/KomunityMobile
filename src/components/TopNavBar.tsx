@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'Outfit-Bold',
         color: '#111827',
     },
 });

@@ -7,6 +7,8 @@ import {
   StyleSheet as RNStyleSheet,
   BackHandler,
 } from "react-native";
+import { useFonts } from "expo-font";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
 import * as Haptics from "expo-haptics";
@@ -40,6 +42,10 @@ import ErrorBoundary from "./src/components/ErrorBoundary";
 import client, { setAuthToken, loadToken, clearToken } from "./src/api/client";
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    "Outfit-Bold": require("./assets/fonts/Outfit-Bold.ttf"),
+    "Outfit-Regular": require("./assets/fonts/Outfit-Regular.ttf"),
+  });
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isSigningUp, setIsSigningUp] = React.useState(false);
   const [isResettingPassword, setIsResettingPassword] = React.useState(false);
@@ -289,8 +295,8 @@ export default function App() {
     setPreviewingGroup(null);
   };
 
-  // Show loading screen while checking for stored token
-  if (isCheckingAuth) {
+  // Show loading screen while checking for stored token or loading fonts
+  if (isCheckingAuth || !fontsLoaded) {
     return (
       <ErrorBoundary>
         <SafeAreaProvider>
@@ -457,7 +463,10 @@ export default function App() {
     <ErrorBoundary>
       <SafeAreaProvider>
         <StatusBar style="dark" />
-        <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+        <LinearGradient
+          colors={['#bfdbfe', '#f1f5f9', '#ffffff']}
+          style={{ flex: 1 }}
+        >
           {shouldShowTopNavBar() && (
             <TopNavBar
               title={getCurrentTitle()}
@@ -668,7 +677,7 @@ export default function App() {
             }}
             profilePicture={userProfile?.profile_picture}
           />
-        </View>
+          </LinearGradient>
       </SafeAreaProvider>
     </ErrorBoundary>
   );

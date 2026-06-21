@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions, RefreshControl, Share } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import client from '../api/client';
 import { FeedPlaceholder } from '../components/Loaders';
@@ -245,7 +246,10 @@ const GroupFeedScreen = ({ group, onBack, onSelectPost, onCreatePost }: GroupFee
                     />
                 }
                 renderItem={({ item }) => (
-                    <View style={styles.postCard}>
+                    <LinearGradient
+                        colors={['#ffffff', '#eff6ff']}
+                        style={styles.postCard}
+                    >
                         {/* Make the author and content area clickable to view details */}
                         <TouchableOpacity
                             activeOpacity={0.7}
@@ -307,7 +311,7 @@ const GroupFeedScreen = ({ group, onBack, onSelectPost, onCreatePost }: GroupFee
                                 <Text style={styles.footerActionText}>🚀 share</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </LinearGradient>
                 )}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
@@ -339,7 +343,7 @@ const GroupFeedScreen = ({ group, onBack, onSelectPost, onCreatePost }: GroupFee
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
+        backgroundColor: 'transparent',
     },
     centered: {
         flex: 1,
@@ -352,7 +356,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: '#ffffff',
+        backgroundColor: 'transparent',
         borderBottomWidth: 1,
         borderBottomColor: '#e5e7eb',
     },
@@ -378,7 +382,6 @@ const styles = StyleSheet.create({
         padding: 12,
     },
     postCard: {
-        backgroundColor: '#ffffff',
         borderRadius: 12,
         marginBottom: 12,
         padding: 12,

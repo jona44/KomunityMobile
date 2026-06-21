@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import client from '../api/client';
 
@@ -170,7 +171,10 @@ const PostDetailScreen = ({ post, onBack, onEditPost }: PostDetailProps) => {
 
     // Renders
     const renderPost = () => (
-        <View style={styles.postCard}>
+        <LinearGradient
+            colors={['#ffffff', '#eff6ff']}
+            style={styles.postCard}
+        >
             <View style={styles.postHeader}>
                 <Image source={{ uri: post.author_detail.profile_picture || undefined }} style={styles.avatar} contentFit="cover" />
                 <View style={{ flex: 1 }}>
@@ -227,17 +231,20 @@ const PostDetailScreen = ({ post, onBack, onEditPost }: PostDetailProps) => {
                     <Text style={styles.statText}>Share</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </LinearGradient>
     );
 
     const renderComment = ({ item }: { item: Comment }) => (
         <View style={styles.commentRow}>
             <Image source={{ uri: item.author_detail.profile_picture || undefined }} style={[styles.avatar, { width: 34, height: 34 }]} />
             <View style={{ flex: 1, marginLeft: 10 }}>
-                <View style={styles.bubble}>
+                <LinearGradient
+                    colors={['#ffffff', '#dcfce7']}
+                    style={styles.bubble}
+                >
                     <Text style={styles.commentAuthor}>{item.author_detail.full_name}</Text>
                     <Text style={styles.commentText}>{item.content}</Text>
-                </View>
+                </LinearGradient>
                 <View style={styles.actions}>
                     <Text style={styles.date}>{formatDate(item.created_at)}</Text>
                     <TouchableOpacity onPress={() => openReplyInput(item)}><Text style={styles.actionText}>Reply</Text></TouchableOpacity>
@@ -253,10 +260,13 @@ const PostDetailScreen = ({ post, onBack, onEditPost }: PostDetailProps) => {
                     <View key={r.id} style={{ flexDirection: 'row', marginTop: 12 }}>
                         <Image source={{ uri: r.author_detail.profile_picture || undefined }} style={[styles.avatar, { width: 28, height: 28 }]} />
                         <View style={{ flex: 1, marginLeft: 10 }}>
-                            <View style={[styles.bubble, { backgroundColor: '#f8f9fa' }]}>
+                            <LinearGradient
+                                colors={['#ffffff', '#dcfce7']}
+                                style={styles.bubble}
+                            >
                                 <Text style={styles.commentAuthor}>{r.author_detail.full_name}</Text>
                                 <Text style={styles.commentText}>{r.content}</Text>
-                            </View>
+                            </LinearGradient>
                             {currentUserProfile?.id === r.author_detail.id && (
                                 <View style={styles.actions}>
                                     <Text style={styles.date}>{formatDate(r.created_at)}</Text>
@@ -272,7 +282,7 @@ const PostDetailScreen = ({ post, onBack, onEditPost }: PostDetailProps) => {
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <View style={{ flex: 1, backgroundColor: 'transparent' }}>
             {/* Header */}
             <View style={[styles.navbar, { paddingTop: insets.top }]}>
                 <TouchableOpacity onPress={onBack} style={{ padding: 12 }}>
@@ -293,7 +303,7 @@ const PostDetailScreen = ({ post, onBack, onEditPost }: PostDetailProps) => {
                     keyExtractor={item => item.id.toString()}
                     renderItem={renderComment}
                     ListHeaderComponent={() => (
-                        <View style={{ backgroundColor: '#f3f4f6' }}>
+                        <View style={{ backgroundColor: 'transparent' }}>
                             {renderPost()}
                             <View style={styles.commentSectionHeader}>
                                 <Text style={styles.commentSectionTitle}>COMMENTS</Text>
@@ -374,8 +384,8 @@ const PostDetailScreen = ({ post, onBack, onEditPost }: PostDetailProps) => {
 };
 
 const styles = StyleSheet.create({
-    navbar: { backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderColor: '#e5e7eb' },
-    postCard: { backgroundColor: '#fff', padding: 15, marginBottom: 8 },
+    navbar: { backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderColor: '#e5e7eb' },
+    postCard: { padding: 15, marginBottom: 8 },
     postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
     avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#eff6ff', borderWidth: 2, borderColor: '#2563eb' },
     author: { fontWeight: 'bold', fontSize: 16, marginLeft: 12, color: '#111827' },
@@ -388,17 +398,17 @@ const styles = StyleSheet.create({
     statButton: { flexDirection: 'row', alignItems: 'center' },
     statText: { marginLeft: 6, fontSize: 14, color: '#6b7280', fontWeight: '500' },
 
-    commentSectionHeader: { padding: 15, backgroundColor: '#f3f4f6' },
+    commentSectionHeader: { padding: 15, backgroundColor: 'transparent' },
     commentSectionTitle: { fontWeight: 'bold', fontSize: 13, color: '#6b7280', letterSpacing: 1 },
 
-    commentRow: { flexDirection: 'row', padding: 15, backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#f3f4f6' },
-    bubble: { backgroundColor: '#f3f4f6', padding: 12, borderRadius: 18, borderTopLeftRadius: 2 },
+    commentRow: { flexDirection: 'row', padding: 15, backgroundColor: 'transparent', borderBottomWidth: 1, borderColor: '#f3f4f6' },
+    bubble: { padding: 12, borderRadius: 18, borderTopLeftRadius: 2 },
     commentAuthor: { fontWeight: 'bold', marginBottom: 2, fontSize: 14, color: '#111827' },
     commentText: { fontSize: 15, color: '#374151', lineHeight: 20 },
     actions: { flexDirection: 'row', gap: 15, marginTop: 8, alignItems: 'center' },
     actionText: { fontSize: 12, color: '#2563eb', fontWeight: 'bold' },
 
-    bottomTrigger: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', paddingTop: 12, paddingHorizontal: 16, borderTopWidth: 1, borderColor: '#e5e7eb' },
+    bottomTrigger: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(255, 255, 255, 0.9)', paddingTop: 12, paddingHorizontal: 16, borderTopWidth: 1, borderColor: '#e5e7eb' },
     triggerButton: { backgroundColor: '#f3f4f6', borderRadius: 24, paddingVertical: 10, paddingLeft: 20, paddingRight: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     triggerText: { color: '#6b7280', fontSize: 15 },
     triggerIcon: { backgroundColor: '#2563eb', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 18 },

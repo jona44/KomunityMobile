@@ -9,6 +9,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import client from "../api/client";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 import SearchScreen from "./SearchScreen";
@@ -153,67 +154,72 @@ const HomeScreen = ({
         }
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.groupCard}
             onPress={() => onViewGroupDetails?.(item)}
+            activeOpacity={0.85}
           >
-            {item.cover_image ? (
-              <Image
-                source={{ uri: item.cover_image }}
-                style={styles.coverImage}
-                transition={200}
-              />
-            ) : (
-              <View
-                style={[styles.coverImage, { backgroundColor: "#e5e7eb" }]}
-              />
-            )}
-            <View style={styles.cardContent}>
-              <View style={styles.cardHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.groupName}>{item.name}</Text>
-                  <Text style={styles.memberCount}>
-                    {item.total_members} members
-                  </Text>
+            <LinearGradient
+              colors={["#ffffff", "#f1f5f9"]}
+              style={styles.groupCard}
+            >
+              {item.cover_image ? (
+                <Image
+                  source={{ uri: item.cover_image }}
+                  style={styles.coverImage}
+                  transition={200}
+                />
+              ) : (
+                <View
+                  style={[styles.coverImage, { backgroundColor: "#e5e7eb" }]}
+                />
+              )}
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.groupName}>{item.name}</Text>
+                    <Text style={styles.memberCount}>
+                      {item.total_members} members
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={styles.description} numberOfLines={2}>
+                  {item.description || "No description available"}
+                </Text>
+
+                <View style={styles.actionRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.detailsButton,
+                      item.is_selected && styles.selectedButton,
+                    ]}
+                    onPress={() => handleSelectGroup(item.id)}
+                  >
+                    <Text
+                      style={[
+                        styles.detailsButtonText,
+                        item.is_selected && styles.selectedButtonText,
+                      ]}
+                    >
+                      {item.is_selected ? "Selected" : "Select"}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.feedButton}
+                    onPress={() => onSelectGroup(item)}
+                  >
+                    <Text style={styles.feedButtonText}>Discussion Feed</Text>
+                    {item.unread_posts_count > 0 && (
+                      <View style={styles.notificationBadge}>
+                        <Text style={styles.badgeText}>
+                          {item.unread_posts_count}
+                        </Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
                 </View>
               </View>
-
-              <Text style={styles.description} numberOfLines={2}>
-                {item.description || "No description available"}
-              </Text>
-
-              <View style={styles.actionRow}>
-                <TouchableOpacity
-                  style={[
-                    styles.detailsButton,
-                    item.is_selected && styles.selectedButton,
-                  ]}
-                  onPress={() => handleSelectGroup(item.id)}
-                >
-                  <Text
-                    style={[
-                      styles.detailsButtonText,
-                      item.is_selected && styles.selectedButtonText,
-                    ]}
-                  >
-                    {item.is_selected ? "Selected" : "Select"}
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.feedButton}
-                  onPress={() => onSelectGroup(item)}
-                >
-                  <Text style={styles.feedButtonText}>Discussion Feed</Text>
-                  {item.unread_posts_count > 0 && (
-                    <View style={styles.notificationBadge}>
-                      <Text style={styles.badgeText}>
-                        {item.unread_posts_count}
-                      </Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
+            </LinearGradient>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
@@ -229,7 +235,7 @@ const HomeScreen = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9fafb",
+    backgroundColor: "transparent",
   },
   headerRow: {
     flexDirection: "row",
@@ -238,7 +244,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 50, // Safe area
     paddingBottom: 10,
-    backgroundColor: "#ffffff",
+    backgroundColor: "transparent",
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
   },
@@ -286,7 +292,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   groupCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 12,
     marginBottom: 16,
     overflow: "hidden",

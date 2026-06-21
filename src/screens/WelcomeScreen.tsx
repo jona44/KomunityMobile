@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } fr
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface WelcomeProps {
     onShowLogin: () => void;
@@ -31,9 +32,13 @@ const WelcomeScreen = ({ onShowLogin, onShowSignUp }: WelcomeProps) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.innerContainer}>
-                {/* Logo & Brand Header */}
+        <LinearGradient
+            colors={['#bfdbfe', '#f1f5f9', '#ffffff']}
+            style={styles.container}
+        >
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.innerContainer}>
+                {/* Logo */}
                 <View style={styles.headerContainer}>
                     <Image
                         source={require('../../assets/icon.png')}
@@ -41,8 +46,6 @@ const WelcomeScreen = ({ onShowLogin, onShowSignUp }: WelcomeProps) => {
                         contentFit="contain"
                         transition={300}
                     />
-                    <Text style={styles.brandTitle}>Komunity</Text>
-                    <Text style={styles.brandSubtitle}>Digitizing Trust & Mutual Aid</Text>
                 </View>
 
                 {/* Value Props Grid */}
@@ -111,13 +114,13 @@ const WelcomeScreen = ({ onShowLogin, onShowSignUp }: WelcomeProps) => {
                 </View>
             </View>
         </SafeAreaView>
-    );
+    </LinearGradient>
+);
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffff',
     },
     innerContainer: {
         flex: 1,
@@ -130,10 +133,10 @@ const styles = StyleSheet.create({
         marginTop: 40,
     },
     logoImage: {
-        width: 80,
-        height: 80,
-        marginBottom: 16,
-        borderRadius: 20,
+        width: 220,
+        height: 220,
+        marginBottom: 8,
+        borderRadius: 55,
     },
     brandTitle: {
         fontSize: 44,

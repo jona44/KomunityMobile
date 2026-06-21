@@ -2,6 +2,9 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView, Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import client, { setAuthToken, saveToken } from '../api/client';
 import { validateEmail } from '../utils/validation';
 
@@ -73,12 +76,16 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword, onBack }:
         setLoading(true);
         try {
             const backendBaseUrl = client.defaults.baseURL ? client.defaults.baseURL.replace('/api/v1/', '') : 'http://127.0.0.1:8000';
-            const callbackUrl = '/api/v1/auth/mobile-callback/';
-            const authUrl = `${backendBaseUrl}/accounts/${provider}/login/?next=${encodeURIComponent(callbackUrl)}`;
+            const redirectUrl = Linking.createURL('auth-success');
+            const callbackPath = '/api/v1/auth/mobile-callback/';
+            const nextUrl = `${callbackPath}?redirect_url=${encodeURIComponent(redirectUrl)}`;
+            
+            const authUrl = `${backendBaseUrl}/accounts/${provider}/login/?next=${encodeURIComponent(nextUrl)}`;
             
             console.log('[Social Auth] Requesting URL:', authUrl);
+            console.log('[Social Auth] Redirect URL:', redirectUrl);
             
-            const result = await WebBrowser.openAuthSessionAsync(authUrl, 'komunity://auth-success');
+            const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
             
             if (result.type === 'success' && result.url) {
                 console.log('[Social Auth] Success redirect url:', result.url);
@@ -106,14 +113,24 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword, onBack }:
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.innerContainer}>
+        <LinearGradient
+            colors={['#bfdbfe', '#f1f5f9', '#ffffff']}
+            style={styles.container}
+        >
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.innerContainer}>
                 {onBack && (
                     <TouchableOpacity onPress={onBack} style={styles.backButton} activeOpacity={0.7}>
                         <Text style={styles.backButtonText}>← Back</Text>
                     </TouchableOpacity>
                 )}
-                <Text style={styles.title}>Komunity</Text>
+                <View style={styles.logoContainer}>
+                    <Image
+                        source={require('../../assets/icon.png')}
+                        style={styles.logoImage}
+                        contentFit="contain"
+                    />
+                </View>
                 <Text style={styles.subtitle}>Sign in to your account</Text>
 
                 <TextInput
@@ -182,6 +199,7 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword, onBack }:
                         disabled={loading}
                         activeOpacity={0.8}
                     >
+                        <Ionicons name="logo-google" size={18} color="#ea4335" />
                         <Text style={[styles.socialButtonText, styles.googleButtonText]}>Google</Text>
                     </TouchableOpacity>
                     
@@ -191,6 +209,7 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword, onBack }:
                         disabled={loading}
                         activeOpacity={0.8}
                     >
+                        <Ionicons name="logo-facebook" size={18} color="#ffffff" />
                         <Text style={[styles.socialButtonText, styles.facebookButtonText]}>Facebook</Text>
                     </TouchableOpacity>
                 </View>
@@ -206,6 +225,7 @@ const LoginScreen = ({ onLoginSuccess, onShowSignUp, onForgotPassword, onBack }:
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
+        </LinearGradient>
     );
 };
 
@@ -219,9 +239,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 30,
     },
+    logoContainer: {
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    logoImage: {
+        width: 220,
+        height: 220,
+        borderRadius: 55,
+    },
     title: {
         fontSize: 36,
-        fontWeight: 'bold',
+        fontFamily: 'Outfit-Bold',
         textAlign: 'center',
         color: '#2563eb',
         marginBottom: 8,
@@ -230,7 +259,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
         color: '#6b7280',
-        marginBottom: 40,
+        marginBottom: 24,
     },
     input: {
         backgroundColor: '#f9fafb',
@@ -353,11 +382,14 @@ const styles = StyleSheet.create({
     },
     socialButton: {
         flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
         padding: 14,
         borderRadius: 12,
-        alignItems: 'center',
         borderWidth: 1,
         borderColor: '#e5e7eb',
+        gap: 8,
     },
     googleButton: {
         backgroundColor: '#ffffff',

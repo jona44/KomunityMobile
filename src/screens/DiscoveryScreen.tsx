@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, SafeAreaView, Alert, RefreshControl, Share } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import client from '../api/client';
 import SearchScreen from './SearchScreen';
@@ -175,53 +176,57 @@ const DiscoveryScreen = ({ onBack, onGroupJoined, onViewGroupDetails }: Discover
                     const btn = getButtonConfig(item);
                     return (
                         <TouchableOpacity
-                            style={styles.groupCard}
                             onPress={() => onViewGroupDetails?.(item)}
                             activeOpacity={0.85}
                         >
-                            {item.cover_image ? (
-                                <Image
-                                    source={{ uri: item.cover_image }}
-                                    style={styles.coverImage}
-                                    transition={200}
-                                />
-                            ) : (
-                                <View style={[styles.coverImage, { backgroundColor: '#e5e7eb' }]} />
-                            )}
-                            <View style={styles.cardContent}>
-                                <Text style={styles.groupName}>{item.name}</Text>
-                                <Text style={styles.memberCount}>{item.total_members} members</Text>
-                                <Text style={styles.description} numberOfLines={3}>
-                                    {item.description || 'Connecting community members together.'}
-                                </Text>
+                            <LinearGradient
+                                colors={['#ffffff', '#f1f5f9']}
+                                style={styles.groupCard}
+                            >
+                                {item.cover_image ? (
+                                    <Image
+                                        source={{ uri: item.cover_image }}
+                                        style={styles.coverImage}
+                                        transition={200}
+                                    />
+                                ) : (
+                                    <View style={[styles.coverImage, { backgroundColor: '#e5e7eb' }]} />
+                                )}
+                                <View style={styles.cardContent}>
+                                    <Text style={styles.groupName}>{item.name}</Text>
+                                    <Text style={styles.memberCount}>{item.total_members} members</Text>
+                                    <Text style={styles.description} numberOfLines={3}>
+                                        {item.description || 'Connecting community members together.'}
+                                    </Text>
 
-                                <TouchableOpacity
-                                    style={styles.viewDetailsLink}
-                                    onPress={() => onViewGroupDetails?.(item)}
-                                >
-                                    <Text style={styles.viewDetailsText}>View Details →</Text>
-                                </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.viewDetailsLink}
+                                        onPress={() => onViewGroupDetails?.(item)}
+                                    >
+                                        <Text style={styles.viewDetailsText}>View Details →</Text>
+                                    </TouchableOpacity>
 
-                                <View style={styles.actionRow}>
-                                    <TouchableOpacity
-                                        style={[btn.style, joiningId === item.id && styles.buttonLoading, { flex: 4 }]}
-                                        onPress={() => handleJoinGroup(item)}
-                                        disabled={btn.disabled || joiningId === item.id}
-                                    >
-                                        {joiningId === item.id ? (
-                                            <ActivityIndicator size="small" color="#ffffff" />
-                                        ) : (
-                                            <Text style={btn.textStyle}>{btn.label}</Text>
-                                        )}
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.shareIconBtn}
-                                        onPress={() => handleShareGroup(item)}
-                                    >
-                                        <Text style={styles.shareIconText}>🚀</Text>
-                                    </TouchableOpacity>
+                                    <View style={styles.actionRow}>
+                                        <TouchableOpacity
+                                            style={[btn.style, joiningId === item.id && styles.buttonLoading, { flex: 4 }]}
+                                            onPress={() => handleJoinGroup(item)}
+                                            disabled={btn.disabled || joiningId === item.id}
+                                        >
+                                            {joiningId === item.id ? (
+                                                <ActivityIndicator size="small" color="#ffffff" />
+                                            ) : (
+                                                <Text style={btn.textStyle}>{btn.label}</Text>
+                                            )}
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.shareIconBtn}
+                                            onPress={() => handleShareGroup(item)}
+                                        >
+                                            <Text style={styles.shareIconText}>🚀</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
-                            </View>
+                            </LinearGradient>
                         </TouchableOpacity>
                     );
                 }}
@@ -238,7 +243,7 @@ const DiscoveryScreen = ({ onBack, onGroupJoined, onViewGroupDetails }: Discover
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
+        backgroundColor: 'transparent',
     },
     header: {
         flexDirection: 'row',
@@ -246,7 +251,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingBottom: 12,
-        backgroundColor: '#ffffff',
+        backgroundColor: 'transparent',
         borderBottomWidth: 1,
         borderBottomColor: '#e5e7eb',
     },
@@ -279,7 +284,6 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
     },
     groupCard: {
-        backgroundColor: '#ffffff',
         borderRadius: 16,
         marginBottom: 16,
         overflow: 'hidden',
